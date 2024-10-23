@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'game.dart';
 
 void main() => runApp(Fludo());
-
+//test 2
 class Fludo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -14,5 +14,3 @@ class Fludo extends StatelessWidget {
     );
   }
 }
-
-//Hallo
