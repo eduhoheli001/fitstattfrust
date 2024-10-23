@@ -1,7 +1,7 @@
 # fittstattfrust
 
 A new Flutter project.
-
+Hallo Lara :)
 ## Getting Started
 
 This project is a starting point for a Flutter application.
