@@ -5,7 +5,7 @@ Hallo Lara :)
 ## Getting Started
 
 This project is a starting point for a Flutter application.
-
+ich hasse alles
 Fuck=GIT
 A few resources to get you started if this is your first Flutter project:
 
