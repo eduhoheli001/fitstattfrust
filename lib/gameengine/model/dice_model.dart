@@ -10,4 +10,10 @@ class DiceModel with ChangeNotifier {
     print("diceOne: $diceOne");
     notifyListeners();
   }
+
+  void setDiceOne(int value) {
+    diceOne = value;
+    print("Manual diceOne set to: $diceOne");
+    notifyListeners();
+  }
 }

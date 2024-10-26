@@ -47,18 +47,38 @@ class _MyHomePageState extends State<MyHomePage> {
         key: keyBar,
         title: Text('Fit statt Frust'),
       ),
-      body: GamePlay(keyBar, gameState),
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              height: 20,
+              child: Text(
+                "Aktueller Spieler: ${gameState.getCurrentPlayerName()}",
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+            ),
+          ),
+          GamePlay(keyBar, gameState),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              child:Dice()
+            ),
+          ),
+        ],
+      ),
+
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
-        child: Container(
-          height: 50.0,
+        child: SizedBox(
           child: Text(
-            "Aktueller Spieler: ${gameState.currentPlayerName}",
-            style: TextStyle(fontSize: 20, color: Colors.black),
+            "Aktueller Spieler: ${gameState.getCurrentPlayerName()}",
+            style: TextStyle(fontSize: 8, color: Colors.black),
           ),
         ),
       ),
-      floatingActionButton: Dice(),
+     // floatingActionButton: ,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }

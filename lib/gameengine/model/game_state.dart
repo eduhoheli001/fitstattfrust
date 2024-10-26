@@ -4,6 +4,7 @@ import 'package:fitstattfrust/gameengine/path.dart';
 import './position.dart';
 import './token.dart';
 
+
 class GameState with ChangeNotifier {
   List<Token> gameTokens = List.filled(16, Token(TokenType.green, Position(0, 0), TokenState.initial, 0), growable: false);
   List<Position> starPositions = [];
@@ -12,7 +13,22 @@ class GameState with ChangeNotifier {
   List<Position> blueInitital = [];
   List<Position> redInitital = [];
   TokenType currentPlayer = TokenType.green;
-  String currentPlayerName = "Grün:Laura";
+
+  String getCurrentPlayerName() {
+    switch (currentPlayer) {
+      case TokenType.green:
+      return "Grün";
+      case TokenType.yellow:
+        return "Gelb";
+      case TokenType.blue:
+        return "Blau";
+      case TokenType.red:
+        return "Rot";
+    }
+    return "";
+  }
+
+
   GameState() {
     this.gameTokens = [
       //Green
@@ -54,23 +70,20 @@ class GameState with ChangeNotifier {
     switch (currentPlayer) {
       case TokenType.green:
         currentPlayer = TokenType.yellow;
-        currentPlayerName = "Grün:Laura";
         break;
       case TokenType.yellow:
         currentPlayer = TokenType.blue;
-        currentPlayerName = "Blau:Hannah";
         break;
       case TokenType.blue:
         currentPlayer = TokenType.red;
-        currentPlayerName = "Blau:Ange";
         break;
       case TokenType.red:
         currentPlayer = TokenType.green;
-        currentPlayerName = "Blau:Fabio";
         break;
     }
     notifyListeners();
   }
+
 
   bool isCurrentPlayer(Token token) {
     return token.type == currentPlayer;
@@ -79,11 +92,16 @@ class GameState with ChangeNotifier {
 
 
   void moveToken(Token token, int steps) {
+//ich möchte einen count hinzufügen. Welcher nur greift, wenn token is inital
+  //bei inital kann man 3 mal würfeln/ wenn nicht 6 dann kommt der nächste Spieler
+// zusätlich sollte nach jedem move der würfel zurückgesetzt werden
+
 
     //Darf ich spielen
     if (!isCurrentPlayer(token)) return;
 
     if (token.tokenState == TokenState.home) return;
+
     if (token.tokenState == TokenState.initial && steps != 6) return;
 
     Position destination;
@@ -140,8 +158,8 @@ class GameState with ChangeNotifier {
       }
     }
 
-    // Spielerwechsel nur -> wenn keine 6
-    if (steps != 6)
+    // Spielerwechsel muss noch logik implementiert werden!!!
+   // if (steps != 6)
       _switchToNextPlayer();
 
   }

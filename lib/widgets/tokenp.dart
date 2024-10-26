@@ -3,7 +3,7 @@ import '../gameengine/model/dice_model.dart';
 import '../gameengine/model/game_state.dart';
 import '../gameengine/model/token.dart';
 import 'package:provider/provider.dart';
-
+//Spielfigur
 class Tokenp extends StatelessWidget {
   final Token token;
   final List<double> dimentions;
@@ -16,9 +16,9 @@ class Tokenp extends StatelessWidget {
       case TokenType.green:
         return Colors.green;
       case TokenType.yellow:
-        return Colors.yellow[900] ?? Colors.yellow;
+        return Colors.yellow;
       case TokenType.blue:
-        return Colors.blue[600] ?? Colors.blue;
+        return Colors.blue;
       case TokenType.red:
         return Colors.red;
     }
@@ -39,7 +39,7 @@ class Tokenp extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           // nullable fix -> check current player
-          if (gameState != null && dice != null && gameState.isCurrentPlayer(token)) {
+          if (gameState != null && dice != null) {
             gameState.moveToken(token, dice.diceOne);
           }
         },
