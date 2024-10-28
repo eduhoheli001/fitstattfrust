@@ -9,7 +9,6 @@ enum TokenType {
 enum TokenState {
   home,
   normal,
-  safeinpair,
   safezone
 }
 

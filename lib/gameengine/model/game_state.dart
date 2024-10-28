@@ -149,6 +149,60 @@ class GameState with ChangeNotifier {
     ];
     notifyListeners();
   }
+  //zum testen des Spielfeldes
+  void debugModeSetToken() {
+    //muss noch getestet werden!!!
+    currentPlayer = TokenType.green; //ausahl welcher spieler
+    rollCount = 0;
+    noSixCount = 0;
+    hasMovedToken = false;
+
+    //reset gametoken
+    gameTokens = [
+      /*
+      Token(TokenType.green, Position(1, 1), TokenState.home, 0),
+      Token(TokenType.green, Position(1, 2), TokenState.home, 1),
+      Token(TokenType.green, Position(2, 1), TokenState.home, 2),
+      Token(TokenType.green, Position(2, 2), TokenState.home, 3),
+      Token(TokenType.yellow, Position(1, 12), TokenState.home, 4),
+      Token(TokenType.yellow, Position(1, 13), TokenState.home, 5),
+      Token(TokenType.yellow, Position(2, 12), TokenState.home, 6),
+      Token(TokenType.yellow, Position(2, 13), TokenState.home, 7),
+      Token(TokenType.red, Position(12, 1), TokenState.home, 8),
+      Token(TokenType.red, Position(12, 2), TokenState.home, 9),
+      Token(TokenType.red, Position(13, 1), TokenState.home, 10),
+      Token(TokenType.red, Position(13, 2), TokenState.home, 11),
+      Token(TokenType.blue, Position(12, 12), TokenState.home, 12),
+      Token(TokenType.blue, Position(12, 13), TokenState.home, 13),
+      Token(TokenType.blue, Position(13, 12), TokenState.home, 14),
+      Token(TokenType.blue, Position(13, 13), TokenState.home, 15),*/
+
+      Token(TokenType.green, Position(6, 2), TokenState.normal, 0),
+      Token(TokenType.green, Position(6, 3), TokenState.normal, 1),
+    //  Token(TokenType.green, Position(7, 4), TokenState.normal, 2),
+    //  Token(TokenType.green, Position(7, 1), TokenState.normal, 3),
+      /*Token(TokenType.yellow, Position(1, 12), TokenState.normal, 4),
+      Token(TokenType.yellow, Position(1, 13), TokenState.normal, 5),
+      Token(TokenType.yellow, Position(2, 12), TokenState.normal, 6),
+      Token(TokenType.yellow, Position(2, 13), TokenState.normal, 7),
+      Token(TokenType.red, Position(12, 1), TokenState.normal, 8),
+      Token(TokenType.red, Position(12, 2), TokenState.normal, 9),
+      Token(TokenType.red, Position(13, 1), TokenState.normal, 10),
+      Token(TokenType.red, Position(13, 2), TokenState.normal, 11),
+      Token(TokenType.blue, Position(12, 12), TokenState.normal, 12),
+      Token(TokenType.blue, Position(12, 13), TokenState.normal, 13),
+      Token(TokenType.blue, Position(13, 12), TokenState.normal, 14),
+      Token(TokenType.blue, Position(13, 13), TokenState.normal, 15)*/
+
+
+
+
+
+    ];
+    notifyListeners();
+  }
+
+
 
 //Checkwinner
   void checkWinner(BuildContext context) {
@@ -305,7 +359,7 @@ class GameState with ChangeNotifier {
       }
     }
 
-    checkWinner(context);
+   // checkWinner(context);
   }
 
   bool _isPositionOccupiedBySameType(Token token, Position destination) {
@@ -322,12 +376,14 @@ class GameState with ChangeNotifier {
     // Prüfen, ob der Token auf einer "home"-Position bleibt
     if (isHomePosition(token, destination)) {
       this.gameTokens[token.id].tokenState = TokenState.home;
+      print("home");
       return null;
     }
 
     // Prüfen, ob der Token in eine "safezone" gelangt
     if (isSafeZone(token, destination)) {
       this.gameTokens[token.id].tokenState = TokenState.safezone;
+      print("safezone");
       return null;
     }
 
@@ -337,6 +393,7 @@ class GameState with ChangeNotifier {
     // Wenn kein Token auf der Zielposition ist, setze den Token auf "normal"
     if (tokenAtDestination.isEmpty) {
       this.gameTokens[token.id].tokenState = TokenState.normal;
+      print("normal");
       return null;
     }
 
@@ -346,6 +403,8 @@ class GameState with ChangeNotifier {
     // Wenn bereits ein eigener Token auf der Zielposition ist, ist der Zug ungültig
     if (tokenAtDestinationSameType.isNotEmpty) {
       print("Zug ungültig: Ein eigener Token befindet sich bereits auf dieser Position.");
+
+      //setToken
       return null;
     }
 

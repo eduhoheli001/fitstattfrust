@@ -67,6 +67,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () => gameState.resetGame(),
                   child: Text("Spiel zurücksetzen"),
                 ),
+                ElevatedButton(
+                  onPressed: () => gameState.debugModeSetToken(),
+                  child: Text("Debugger"),
+                ),
               ],
             ),
           ),
