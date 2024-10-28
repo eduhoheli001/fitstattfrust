@@ -37,7 +37,7 @@ class Board extends StatelessWidget {
           width: isDesktop(context) ? 600 : null,//fix für größe bei web
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/Ludo_board.png"),//Ludo_board
+              image: AssetImage("assets/test.png"),//Ludo_board
               alignment: Alignment.center,
               fit: BoxFit.cover,
             ),

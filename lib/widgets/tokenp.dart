@@ -22,7 +22,7 @@ class Tokenp extends StatelessWidget {
       case TokenType.red:
         return Colors.red;
     }
-    return Colors.red;
+   // return Colors.red;
   }
 
   @override
@@ -40,7 +40,7 @@ class Tokenp extends StatelessWidget {
         onTap: () {
           // nullable fix -> check current player
           if (gameState != null && dice != null) {
-            gameState.moveToken(token, dice.diceOne);
+            gameState.moveToken(token, dice.diceOne, dice);
           }
         },
         child: Card(

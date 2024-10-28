@@ -31,6 +31,8 @@ class _GamePlayState extends State<GamePlay> {
 
   void callBack(Token token) {
     print(token);
+    print(token.tokenState.name);
+    print(token.type);
   }
 
   static List<List<GlobalKey<State>>> _getGlobalKeys() {

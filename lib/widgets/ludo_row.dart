@@ -23,9 +23,9 @@ class LudoRow extends StatelessWidget {
                 right:
                     i == 14 ? BorderSide(color: Colors.grey) : BorderSide.none,
               ),
-              color: Colors.white,//Utility.getColor(row, i)
+              color: Colors.transparent,//Utility.getColor(row, i)
             ),
-            child: Text('${row},${i}',style:TextStyle(color:Colors.black,fontSize: 10)),
+            child: Text('${row},${i}', style: TextStyle(color:Colors.black,fontSize: 10)),
           ),
         ),
       ));
@@ -36,7 +36,7 @@ class LudoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: <Widget>[..._getColumns()],
+      children: [..._getColumns()],
     );
   }
 

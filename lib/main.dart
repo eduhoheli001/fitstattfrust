@@ -42,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
+    int remainingRolls = gameState.getRemainingRolls();
     return Scaffold(
       appBar: AppBar(
         key: keyBar,
@@ -51,12 +52,22 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Align(
             alignment: Alignment.topCenter,
-            child: SizedBox(
-              height: 20,
-              child: Text(
-                "Aktueller Spieler: ${gameState.getCurrentPlayerName()}",
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Aktueller Spieler: ${gameState.getCurrentPlayerName()}",
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+                Text(
+                  "Verbleibende Würfe: $remainingRolls",
+                  style: TextStyle(fontSize: 14, color: Colors.redAccent),
+                ),
+                ElevatedButton(
+                  onPressed: () => gameState.resetGame(),
+                  child: Text("Spiel zurücksetzen"),
+                ),
+              ],
             ),
           ),
           GamePlay(keyBar, gameState),

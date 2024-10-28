@@ -7,11 +7,10 @@ enum TokenType {
 }
 
 enum TokenState {
-  initial,
   home,
   normal,
-  safe,
   safeinpair,
+  safezone
 }
 
 class Token {

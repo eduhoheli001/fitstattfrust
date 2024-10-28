@@ -5,10 +5,11 @@ class DiceModel with ChangeNotifier {
 
   int get diceOneCount => diceOne;
 
-  void generateDiceOne() {
+  int generateDiceOne() {
     diceOne = Random().nextInt(6) + 1;
     print("diceOne: $diceOne");
     notifyListeners();
+    return diceOne;
   }
 
   void setDiceOne(int value) {
@@ -16,4 +17,6 @@ class DiceModel with ChangeNotifier {
     print("Manual diceOne set to: $diceOne");
     notifyListeners();
   }
+
+
 }
