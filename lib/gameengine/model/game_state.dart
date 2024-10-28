@@ -120,6 +120,63 @@ class GameState with ChangeNotifier {
     }
     notifyListeners();
   }
+  //reset game
+  void resetGame() {
+    //muss noch getestet werden!!!
+    currentPlayer = TokenType.green;
+    rollCount = 0;
+    noSixCount = 0;
+    hasMovedToken = false;
+
+    //reset gametoken
+    gameTokens = [
+      Token(TokenType.green, Position(1, 1), TokenState.home, 0),
+      Token(TokenType.green, Position(1, 2), TokenState.home, 1),
+      Token(TokenType.green, Position(2, 1), TokenState.home, 2),
+      Token(TokenType.green, Position(2, 2), TokenState.home, 3),
+      Token(TokenType.yellow, Position(1, 12), TokenState.home, 4),
+      Token(TokenType.yellow, Position(1, 13), TokenState.home, 5),
+      Token(TokenType.yellow, Position(2, 12), TokenState.home, 6),
+      Token(TokenType.yellow, Position(2, 13), TokenState.home, 7),
+      Token(TokenType.red, Position(12, 1), TokenState.home, 8),
+      Token(TokenType.red, Position(12, 2), TokenState.home, 9),
+      Token(TokenType.red, Position(13, 1), TokenState.home, 10),
+      Token(TokenType.red, Position(13, 2), TokenState.home, 11),
+      Token(TokenType.blue, Position(12, 12), TokenState.home, 12),
+      Token(TokenType.blue, Position(12, 13), TokenState.home, 13),
+      Token(TokenType.blue, Position(13, 12), TokenState.home, 14),
+      Token(TokenType.blue, Position(13, 13), TokenState.home, 15),
+    ];
+    notifyListeners();
+  }
+
+//Checkwinner
+  void checkWinner(BuildContext context) {
+    bool allInSafeZone = gameTokens
+        .where((token) => token.type == currentPlayer)
+        .every((token) => token.tokenState == TokenState.safezone);
+
+    if (allInSafeZone) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Sieger!"),
+            content: Text("${getCurrentPlayerName()} hat gewonnen!"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  resetGame(); // Spiel zurücksetzen
+                },
+                child: Text("Spiel zurücksetzen"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
 
   bool isCurrentPlayer(Token token) {
@@ -169,7 +226,7 @@ class GameState with ChangeNotifier {
     }
   }
 
-  void moveToken(Token token, int steps, DiceModel diceModel) {
+  void moveToken(Token token, int steps, DiceModel diceModel,BuildContext context) {
     if (hasMovedToken) {
       print("Token kann nicht bewegt werden. Bitte würfeln Sie erneut.");
       return;
@@ -367,62 +424,5 @@ class GameState with ChangeNotifier {
         break;
     }
     return destination;
-  }
-}
-//reset game
-void resetGame() {
-  //muss noch getestet werden!!!
-  currentPlayer = TokenType.green;
-  rollCount = 0;
-  noSixCount = 0;
-  hasMovedToken = false;
-
-  //reset gametoken
-  gameTokens = [
-    Token(TokenType.green, Position(1, 1), TokenState.home, 0),
-    Token(TokenType.green, Position(1, 2), TokenState.home, 1),
-    Token(TokenType.green, Position(2, 1), TokenState.home, 2),
-    Token(TokenType.green, Position(2, 2), TokenState.home, 3),
-    Token(TokenType.yellow, Position(1, 12), TokenState.home, 4),
-    Token(TokenType.yellow, Position(1, 13), TokenState.home, 5),
-    Token(TokenType.yellow, Position(2, 12), TokenState.home, 6),
-    Token(TokenType.yellow, Position(2, 13), TokenState.home, 7),
-    Token(TokenType.red, Position(12, 1), TokenState.home, 8),
-    Token(TokenType.red, Position(12, 2), TokenState.home, 9),
-    Token(TokenType.red, Position(13, 1), TokenState.home, 10),
-    Token(TokenType.red, Position(13, 2), TokenState.home, 11),
-    Token(TokenType.blue, Position(12, 12), TokenState.home, 12),
-    Token(TokenType.blue, Position(12, 13), TokenState.home, 13),
-    Token(TokenType.blue, Position(13, 12), TokenState.home, 14),
-    Token(TokenType.blue, Position(13, 13), TokenState.home, 15),
-  ];
-  notifyListeners();
-}
-
-//Checkwinner
-void checkWinner(BuildContext context) {
-  bool allInSafeZone = gameTokens
-      .where((token) => token.type == currentPlayer)
-      .every((token) => token.tokenState == TokenState.safezone);
-
-  if (allInSafeZone) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Sieger!"),
-          content: Text("${getCurrentPlayerName()} hat gewonnen!"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                resetGame(); // Spiel zurücksetzen
-              },
-              child: Text("Spiel zurücksetzen"),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

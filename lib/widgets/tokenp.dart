@@ -40,7 +40,7 @@ class Tokenp extends StatelessWidget {
         onTap: () {
           // nullable fix -> check current player
           if (gameState != null && dice != null) {
-            gameState.moveToken(token, dice.diceOne, dice);
+            gameState.moveToken(token, dice.diceOne, dice,context);
           }
         },
         child: Card(
