@@ -4,6 +4,7 @@ import './widgets/gameplay.dart';
 import 'package:provider/provider.dart';
 import './widgets/dice.dart';
 import './gameengine/model/dice_model.dart';
+import 'gameengine/model/token.dart';
 
 void main() => runApp(FitStattFrust());
 class FitStattFrust extends StatelessWidget {
@@ -54,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: Alignment.topCenter,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: <Widget>[
                 Text(
                   "Aktueller Spieler: ${gameState.getCurrentPlayerName()}",
                   style: TextStyle(fontSize: 16, color: Colors.black),
@@ -63,14 +64,34 @@ class _MyHomePageState extends State<MyHomePage> {
                   "Verbleibende Würfe: $remainingRolls",
                   style: TextStyle(fontSize: 14, color: Colors.redAccent),
                 ),
+
                 ElevatedButton(
                   onPressed: () => gameState.resetGame(),
                   child: Text("Spiel zurücksetzen"),
                 ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
                 ElevatedButton(
                   onPressed: () => gameState.debugModeSetToken(),
                   child: Text("Debugger"),
                 ),
+
+                DropdownButton<TokenType>(
+                  value: gameState.currentPlayer,
+                  items: TokenType.values.map((TokenType playerType) {
+                    return DropdownMenuItem<TokenType>(
+                      value: playerType,
+                      child: Text(playerType.toString().split('.').last),
+                    );
+                  }).toList(),
+                  onChanged: (TokenType? selectedPlayer) {
+                    if (selectedPlayer != null) {
+                      gameState.setCurrentPlayer(selectedPlayer);
+                    }
+                  },
+                ),
+                ])
               ],
             ),
           ),

@@ -103,6 +103,9 @@ class GameState with ChangeNotifier {
   }
 
   void _switchToNextPlayer() {
+    //checkWinner(context);
+
+
     switch (currentPlayer) {
       case TokenType.green:
         currentPlayer = TokenType.yellow;
@@ -177,6 +180,13 @@ class GameState with ChangeNotifier {
     // Gibt -1 zurück, wenn die Position nicht gefunden wird
     return -1;
   }
+//////////////////////////////DEBUGFUNKTIONEN
+  void setCurrentPlayer(TokenType playerType) {
+    currentPlayer = playerType;
+    notifyListeners();
+  }
+
+
 
   void debugModeSetToken() {
 
@@ -204,37 +214,6 @@ class GameState with ChangeNotifier {
 
     notifyListeners();
   }
-
-
-
-//Checkwinner
-  void checkWinner(BuildContext context) {
-    bool allInSafeZone = gameTokens
-        .where((token) => token.type == currentPlayer)
-        .every((token) => token.tokenState == TokenState.safezone);
-
-    if (allInSafeZone) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Sieger!"),
-            content: Text("${getCurrentPlayerName()} hat gewonnen!"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  resetGame(); // Spiel zurücksetzen
-                },
-                child: Text("Spiel zurücksetzen"),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
 
   bool isCurrentPlayer(Token token) {
     return token.type == currentPlayer;
@@ -386,7 +365,11 @@ class GameState with ChangeNotifier {
       var cutToken = _updateBoardState(token, destination, pathPosition);
 
       // Bewegung animieren
-      animateTokenMovement(token, steps);
+      animateTokenMovement(token, steps, context);
+
+      //überprüft ob ein Spieler gewonnen hat
+      checkWinner(context);
+
       // Animation für das Zurücksetzen des geschlagenen Tokens
       if (cutToken != null) {
         animateCutTokenReset(cutToken);
@@ -400,16 +383,17 @@ class GameState with ChangeNotifier {
       }
 
     }
+
   }
   // Token-Bewegungsanimation für reguläre Schritte
-  void animateTokenMovement(Token token, int steps) {
+  void animateTokenMovement(Token token, int steps, BuildContext context) {
     int duration = 0;
     for (int i = 1; i <= steps; i++) {
       duration += 500;
       Future.delayed(Duration(milliseconds: duration), () {
         int stepLoc = token.positionInPath + 1;
-        this.gameTokens[token.id].tokenPosition = _getPosition(token.type, stepLoc);
-        this.gameTokens[token.id].positionInPath = stepLoc;
+        gameTokens[token.id].tokenPosition = _getPosition(token.type, stepLoc);
+        gameTokens[token.id].positionInPath = stepLoc;
         token.positionInPath = stepLoc;
         notifyListeners();
       });
@@ -435,8 +419,6 @@ class GameState with ChangeNotifier {
       notifyListeners();
     });
   }
-
-
 
   bool _isPositionOccupiedBySameType(Token token, Position destination) {
     return gameTokens.any((tkn) =>
@@ -555,4 +537,38 @@ class GameState with ChangeNotifier {
     }
     return destination;
   }
+
+//Checkwinner
+  void checkWinner(BuildContext context) {
+    bool allInSafeZone = gameTokens
+        .where((token) => token.type == currentPlayer)
+        .every((token) => token.tokenState == TokenState.safezone);
+
+    if (allInSafeZone) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Sieger!"),
+            content: Text("${getCurrentPlayerName()} hat gewonnen!"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  resetGame(); // Spiel zurücksetzen
+                },
+                child: Text("Spiel zurücksetzen"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+
+
 }
+
+
+
