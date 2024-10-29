@@ -19,7 +19,6 @@ class GameState with ChangeNotifier {
   int rollCount = 0;
 
   bool isSafeZone(Token token, Position destination) {
-    // Safezone Positionen
     final List<Position> greenSafeZone = [Position(7, 2), Position(7, 3), Position(7, 4), Position(7, 5)];
     final List<Position> yellowSafeZone = [Position(2, 7), Position(3, 7), Position(4, 7), Position(5, 7)];
     final List<Position> blueSafeZone = [Position(7, 12), Position(7, 11), Position(7, 10), Position(7, 9)];
@@ -38,8 +37,8 @@ class GameState with ChangeNotifier {
         return false;
     }
   }
+
   bool isHomePosition(Token token, Position destination) {
-    // Home-Positionen für jeden Token
     final List<Position> greenHomePositions = [Position(1, 1), Position(1, 2), Position(2, 1), Position(2, 2)];
     final List<Position> yellowHomePositions = [Position(1, 12), Position(1, 13), Position(2, 12), Position(2, 13)];
     final List<Position> redHomePositions = [Position(12, 1), Position(12, 2), Position(13, 1), Position(13, 2)];
@@ -149,56 +148,60 @@ class GameState with ChangeNotifier {
     ];
     notifyListeners();
   }
+
   //zum testen des Spielfeldes
+  int getPositionInPath(TokenType type, Position tokenPosition) {
+    List<List<int>> path;
+
+    switch (type) {
+      case TokenType.green:
+        path = Path.greenPath;
+        break;
+      case TokenType.yellow:
+        path = Path.yellowPath;
+        break;
+      case TokenType.blue:
+        path = Path.bluePath;
+        break;
+      case TokenType.red:
+        path = Path.redPath;
+        break;
+    }
+
+    for (int i = 0; i < path.length; i++) {
+      if (path[i][0] == tokenPosition.row && path[i][1] == tokenPosition.column) {
+        return i;
+      }
+    }
+
+    // Gibt -1 zurück, wenn die Position nicht gefunden wird
+    return -1;
+  }
+
   void debugModeSetToken() {
-    //muss noch getestet werden!!!
-    currentPlayer = TokenType.green; //ausahl welcher spieler
-    rollCount = 0;
-    noSixCount = 0;
+
+
+    gameTokens[0].tokenPosition = Position(7, 1);
+    gameTokens[0].positionInPath = getPositionInPath(gameTokens[0].type, gameTokens[0].tokenPosition);
+    gameTokens[0].tokenState = TokenState.normal;
+
+    gameTokens[1].tokenPosition = Position(8, 1);
+    gameTokens[1].positionInPath = getPositionInPath(gameTokens[1].type, gameTokens[1].tokenPosition);
+    gameTokens[1].tokenState = TokenState.normal;
+
+    gameTokens[2].tokenPosition = Position(8, 2);
+    gameTokens[2].positionInPath = getPositionInPath(gameTokens[2].type, gameTokens[2].tokenPosition);
+    gameTokens[2].tokenState = TokenState.normal;
+
+    gameTokens[3].tokenPosition = Position(8, 3);
+    gameTokens[3].positionInPath = getPositionInPath(gameTokens[3].type, gameTokens[3].tokenPosition);
+    gameTokens[3].tokenState = TokenState.normal;
+
+
     hasMovedToken = false;
+    rollCount = 1;
+    noSixCount = 0;
 
-    //reset gametoken
-    gameTokens = [
-      /*
-      Token(TokenType.green, Position(1, 1), TokenState.home, 0),
-      Token(TokenType.green, Position(1, 2), TokenState.home, 1),
-      Token(TokenType.green, Position(2, 1), TokenState.home, 2),
-      Token(TokenType.green, Position(2, 2), TokenState.home, 3),
-      Token(TokenType.yellow, Position(1, 12), TokenState.home, 4),
-      Token(TokenType.yellow, Position(1, 13), TokenState.home, 5),
-      Token(TokenType.yellow, Position(2, 12), TokenState.home, 6),
-      Token(TokenType.yellow, Position(2, 13), TokenState.home, 7),
-      Token(TokenType.red, Position(12, 1), TokenState.home, 8),
-      Token(TokenType.red, Position(12, 2), TokenState.home, 9),
-      Token(TokenType.red, Position(13, 1), TokenState.home, 10),
-      Token(TokenType.red, Position(13, 2), TokenState.home, 11),
-      Token(TokenType.blue, Position(12, 12), TokenState.home, 12),
-      Token(TokenType.blue, Position(12, 13), TokenState.home, 13),
-      Token(TokenType.blue, Position(13, 12), TokenState.home, 14),
-      Token(TokenType.blue, Position(13, 13), TokenState.home, 15),*/
-
-      Token(TokenType.green, Position(6, 2), TokenState.normal, 0),
-      Token(TokenType.green, Position(6, 3), TokenState.normal, 1),
-    //  Token(TokenType.green, Position(7, 4), TokenState.normal, 2),
-    //  Token(TokenType.green, Position(7, 1), TokenState.normal, 3),
-      /*Token(TokenType.yellow, Position(1, 12), TokenState.normal, 4),
-      Token(TokenType.yellow, Position(1, 13), TokenState.normal, 5),
-      Token(TokenType.yellow, Position(2, 12), TokenState.normal, 6),
-      Token(TokenType.yellow, Position(2, 13), TokenState.normal, 7),
-      Token(TokenType.red, Position(12, 1), TokenState.normal, 8),
-      Token(TokenType.red, Position(12, 2), TokenState.normal, 9),
-      Token(TokenType.red, Position(13, 1), TokenState.normal, 10),
-      Token(TokenType.red, Position(13, 2), TokenState.normal, 11),
-      Token(TokenType.blue, Position(12, 12), TokenState.normal, 12),
-      Token(TokenType.blue, Position(12, 13), TokenState.normal, 13),
-      Token(TokenType.blue, Position(13, 12), TokenState.normal, 14),
-      Token(TokenType.blue, Position(13, 13), TokenState.normal, 15)*/
-
-
-
-
-
-    ];
     notifyListeners();
   }
 
@@ -250,22 +253,23 @@ class GameState with ChangeNotifier {
     print("rollDice");
     int diceRoll = diceModel.generateDiceOne();
 
+    // Zurücksetzen, um dem Spieler die Möglichkeit zu geben, den Zug zu nutzen
     hasMovedToken = false;
     notifyListeners();
 
     if (getRemainingRolls() == 0) {
-      print("diceOne0");
-      diceModel.setDiceOne(0); // Setzt auf 0.png, wenn keine Würfe mehr vorhanden sind/muss getestet werden
+      print("Keine verbleibenden Würfe");
+      diceModel.setDiceOne(0); // Setzt auf 0.png, wenn keine Würfe mehr vorhanden sind
       _switchToNextPlayer();
       return;
     }
 
-    // Überprüfung: Hat der Spieler Tokens im Spielfeld?
+    // Überprüfen, ob der Spieler einen Token im Spiel hat
     bool hasTokenInPlay = gameTokens.any((token) =>
     token.type == currentPlayer &&
         token.tokenState != TokenState.home);
 
-    // Falls kein Token im Spiel und keine 6, Wurfzähler erhöhen und ggf. Spielerwechsel
+    // Spieler hat keinen Token im Spiel und keine 6 geworfen
     if (!hasTokenInPlay && diceRoll != 6) {
       rollCount++;
       if (rollCount >= 3) {
@@ -273,14 +277,14 @@ class GameState with ChangeNotifier {
         _switchToNextPlayer();
       }
     } else if (diceRoll == 6) {
-      rollCount = hasTokenInPlay ? 1 : 0; // Setzt rollCount auf 1, wenn bereits ein Token im Spiel ist
+      rollCount = hasTokenInPlay ? 1 : 0; // Nur einen weiteren Wurf, wenn Token im Spiel ist
       print("6 geworfen, der Spieler darf erneut würfeln.");
     } else {
       print("Warten auf Bewegung des Spielers...");
     }
   }
 
-  void moveToken(Token token, int steps, DiceModel diceModel,BuildContext context) {
+  void moveToken(Token token, int steps, DiceModel diceModel, BuildContext context) {
     if (hasMovedToken) {
       print("Token kann nicht bewegt werden. Bitte würfeln Sie erneut.");
       return;
@@ -288,85 +292,119 @@ class GameState with ChangeNotifier {
 
     if (!isCurrentPlayer(token)) return;
 
-    // Token von home ins Spiel bringen
+    Position destination;
+    int pathPosition;
+
+
+    // Token von home ins Spiel bringen, wenn eine 6 geworfen wurde
     if (token.tokenState == TokenState.home && steps == 6) {
       noSixCount = 0;
-      Position destination = _getPosition(token.type, 0);
-      int pathPosition = 0;
+      destination = _getPosition(token.type, 0);
+      pathPosition = 0;
 
-      // Sicherstellen, dass keine Position doppelt belegt wird
+      // Sicherstellen, dass die Position nicht von einem eigenen Token besetzt ist
       if (_isPositionOccupiedBySameType(token, destination)) {
-        print("Zug ungültig: Ein eigener Token befindet sich bereits auf der Startposition.");
+        print("if 1 Zug ungültig: Ein eigener Token befindet sich bereits auf der Startposition.");
         return;
       }
 
+      // Prüfen, ob ein gegnerischer Token auf der Zielposition ist und ggf. entfernen
+      var cutToken = _updateBoardState(token, destination, pathPosition);
+
+      // Wenn ein gegnerischer Token vorhanden ist, wird dieser animiert zurückgesetzt
+      if (cutToken != null) {
+        animateCutTokenReset(cutToken);
+      }
+
       _updateInitalPositions(token);
-      _updateBoardState(token, destination, pathPosition);
+
       this.gameTokens[token.id].tokenPosition = destination;
       this.gameTokens[token.id].positionInPath = pathPosition;
+      this.gameTokens[token.id].tokenState = TokenState.normal;
+
+      print("positionpath ${this.gameTokens[token.id].positionInPath}");
+      print("positionpath ${this.gameTokens[token.id].tokenPosition}");
+
       hasMovedToken = true;
-      rollCount = 1; // Nach Einsetzen des Tokens nur noch ein Wurf zulassen
+      rollCount = 1; //setzt würfel zurück auf eins
       notifyListeners();
     } else if (token.tokenState != TokenState.home) {
       // Token im Spielfeld bewegen
       int step = token.positionInPath + steps;
       if (step > 51) return;
 
-      Position destination = _getPosition(token.type, step);
-      int pathPosition = step;
+      destination = _getPosition(token.type, step);
+      pathPosition = step;
 
+      print("positionpath2 ${destination}");
+      print("positionpath2 ${pathPosition}");
+
+
+      // Sicherstellen, dass Zielposition nicht von eigenem Token besetzt ist
       if (_isPositionOccupiedBySameType(token, destination)) {
         print("Zug ungültig: Ein eigener Token befindet sich bereits auf der Zielposition.");
         return;
       }
-
       var cutToken = _updateBoardState(token, destination, pathPosition);
-      // Token-Bewegungslogik und Animation
-      int duration = 0;
-      for (int i = 1; i <= steps; i++) {
-        duration += 500;
-        Future.delayed(Duration(milliseconds: duration), () {
-          int stepLoc = token.positionInPath + 1;
-          this.gameTokens[token.id].tokenPosition = _getPosition(token.type, stepLoc);
-          this.gameTokens[token.id].positionInPath = stepLoc;
-          token.positionInPath = stepLoc;
-          notifyListeners();
-        });
+
+      // Bewegung animieren
+      animateTokenMovement(token, steps);
+      // Animation für das Zurücksetzen des geschlagenen Tokens
+      if (cutToken != null) {
+        animateCutTokenReset(cutToken);
       }
 
-      if (cutToken != null) {
-        int cutSteps = cutToken.positionInPath;
-        for (int i = 1; i <= cutSteps; i++) {
-          duration += 100;
-          Future.delayed(Duration(milliseconds: duration), () {
-            int stepLoc = cutToken.positionInPath - 1;
-            this.gameTokens[cutToken.id].tokenPosition = _getPosition(cutToken.type, stepLoc);
-            this.gameTokens[cutToken.id].positionInPath = stepLoc;
-            cutToken.positionInPath = stepLoc;
-            notifyListeners();
-          });
-        }
-        Future.delayed(Duration(milliseconds: duration), () {
-          _cutToken(cutToken);
-          notifyListeners();
-        });
-      }
 
       hasMovedToken = true;
       if (steps != 6) {
         noSixCount = 0;
         _switchToNextPlayer();
       }
-    }
 
-   // checkWinner(context);
+    }
   }
+  // Token-Bewegungsanimation für reguläre Schritte
+  void animateTokenMovement(Token token, int steps) {
+    int duration = 0;
+    for (int i = 1; i <= steps; i++) {
+      duration += 500;
+      Future.delayed(Duration(milliseconds: duration), () {
+        int stepLoc = token.positionInPath + 1;
+        this.gameTokens[token.id].tokenPosition = _getPosition(token.type, stepLoc);
+        this.gameTokens[token.id].positionInPath = stepLoc;
+        token.positionInPath = stepLoc;
+        notifyListeners();
+      });
+    }
+  }
+
+// Animation für das Zurücksetzen eines geschlagenen Tokens
+  void animateCutTokenReset(Token cutToken) {
+    int cutSteps = cutToken.positionInPath;
+    int duration = 0;
+    for (int i = 1; i <= cutSteps; i++) {
+      duration += 100;
+      Future.delayed(Duration(milliseconds: duration), () {
+        int stepLoc = cutToken.positionInPath - 1;
+        this.gameTokens[cutToken.id].tokenPosition = _getPosition(cutToken.type, stepLoc);
+        this.gameTokens[cutToken.id].positionInPath = stepLoc;
+        cutToken.positionInPath = stepLoc;
+        notifyListeners();
+      });
+    }
+    Future.delayed(Duration(milliseconds: duration), () {
+      _cutToken(cutToken);
+      notifyListeners();
+    });
+  }
+
+
 
   bool _isPositionOccupiedBySameType(Token token, Position destination) {
     return gameTokens.any((tkn) =>
     tkn.type == token.type &&
         tkn.tokenPosition == destination &&
-        tkn.id != token.id); // sicherstellen, dass es nicht der gleiche Token ist
+        tkn.id != token.id);
   }
 
 
@@ -375,36 +413,25 @@ class GameState with ChangeNotifier {
 
     // Prüfen, ob der Token auf einer "home"-Position bleibt
     if (isHomePosition(token, destination)) {
-      this.gameTokens[token.id].tokenState = TokenState.home;
-      print("home");
+      gameTokens[token.id].tokenState = TokenState.home;
+      print("_updateBoardState: home");
       return null;
     }
 
     // Prüfen, ob der Token in eine "safezone" gelangt
     if (isSafeZone(token, destination)) {
-      this.gameTokens[token.id].tokenState = TokenState.safezone;
-      print("safezone");
+      gameTokens[token.id].tokenState = TokenState.safezone;
+      print("_updateBoardState: safezone");
       return null;
     }
 
     // Prüfen, ob auf der Zielposition ein anderer Token steht
-    List<Token> tokenAtDestination = this.gameTokens.where((tkn) => tkn.tokenPosition == destination).toList();
+    List<Token> tokenAtDestination = gameTokens.where((tkn) => tkn.tokenPosition == destination).toList();
 
     // Wenn kein Token auf der Zielposition ist, setze den Token auf "normal"
     if (tokenAtDestination.isEmpty) {
-      this.gameTokens[token.id].tokenState = TokenState.normal;
-      print("normal");
-      return null;
-    }
-
-    // Tokens desselben Spielertyps auf der Zielposition
-    List<Token> tokenAtDestinationSameType = tokenAtDestination.where((tkn) => tkn.type == token.type).toList();
-
-    // Wenn bereits ein eigener Token auf der Zielposition ist, ist der Zug ungültig
-    if (tokenAtDestinationSameType.isNotEmpty) {
-      print("Zug ungültig: Ein eigener Token befindet sich bereits auf dieser Position.");
-
-      //setToken
+      gameTokens[token.id].tokenState = TokenState.normal;
+      print("_updateBoardState: normal");
       return null;
     }
 
@@ -412,11 +439,13 @@ class GameState with ChangeNotifier {
     for (Token tkn in tokenAtDestination) {
       if (tkn.type != token.type && tkn.tokenState != TokenState.safezone) {
         cutToken = tkn;
+        print("_updateBoardState: Ein Token wurde gekickt.");
+        break;
       }
     }
 
     // Setze den Zustand des Tokens auf "normal", wenn er erfolgreich gezogen werden konnte
-    this.gameTokens[token.id].tokenState = TokenState.normal;
+    gameTokens[token.id].tokenState = TokenState.normal;
     return cutToken;
   }
 
@@ -468,18 +497,22 @@ class GameState with ChangeNotifier {
       case TokenType.green:
         List<int> node = Path.greenPath[step];
         destination = Position(node[0], node[1]);
+        print("0: ${node[0]} 1: ${node[1]}");
         break;
       case TokenType.yellow:
         List<int> node = Path.yellowPath[step];
         destination = Position(node[0], node[1]);
+        print("0: ${node[0]} 1: ${node[1]}");
         break;
       case TokenType.blue:
         List<int> node = Path.bluePath[step];
         destination = Position(node[0], node[1]);
+        print("0: ${node[0]} 1: ${node[1]}");
         break;
       case TokenType.red:
         List<int> node = Path.redPath[step];
         destination = Position(node[0], node[1]);
+        print("0: ${node[0]} 1: ${node[1]}");
         break;
     }
     return destination;
