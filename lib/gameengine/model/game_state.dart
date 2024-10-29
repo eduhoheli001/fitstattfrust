@@ -253,23 +253,21 @@ class GameState with ChangeNotifier {
     print("rollDice");
     int diceRoll = diceModel.generateDiceOne();
 
-    // Zurücksetzen, um dem Spieler die Möglichkeit zu geben, den Zug zu nutzen
     hasMovedToken = false;
     notifyListeners();
 
+    // Überprüfen, ob keine verbleibenden Würfe vorhanden sind
     if (getRemainingRolls() == 0) {
       print("Keine verbleibenden Würfe");
-      diceModel.setDiceOne(0); // Setzt auf 0.png, wenn keine Würfe mehr vorhanden sind
+      diceModel.setDiceOne(0);
       _switchToNextPlayer();
       return;
     }
 
-    // Überprüfen, ob der Spieler einen Token im Spiel hat
     bool hasTokenInPlay = gameTokens.any((token) =>
     token.type == currentPlayer &&
-        token.tokenState != TokenState.home);
+        token.tokenState == TokenState.normal);
 
-    // Spieler hat keinen Token im Spiel und keine 6 geworfen
     if (!hasTokenInPlay && diceRoll != 6) {
       rollCount++;
       if (rollCount >= 3) {
@@ -277,12 +275,52 @@ class GameState with ChangeNotifier {
         _switchToNextPlayer();
       }
     } else if (diceRoll == 6) {
-      rollCount = hasTokenInPlay ? 1 : 0; // Nur einen weiteren Wurf, wenn Token im Spiel ist
+      rollCount = hasTokenInPlay ? 1 : 0;
       print("6 geworfen, der Spieler darf erneut würfeln.");
     } else {
-      print("Warten auf Bewegung des Spielers...");
+      if (!canAnyTokenMove(diceRoll)) {
+        print("Kein gültiger Zug möglich. Nächster Spieler ist dran.");
+        _switchToNextPlayer();
+        notifyListeners();
+      } else {
+        print("Warten auf Bewegung des Spielers...");
+      }
     }
   }
+
+
+  bool canAnyTokenMove(int steps) {
+    // Durchläuft alle Tokens des aktuellen Spielers
+    for (Token token in gameTokens.where((t) => t.type == currentPlayer)) {
+      // Prüft, ob ein Token im Home-Zustand ist und mit einer 6 herausgebracht werden könnte
+      if (token.tokenState == TokenState.home && steps == 6) {
+        return true; // Ein gültiger Zug ist möglich
+      }
+
+      // Wenn der Token im Spielfeld ist, berechne die mögliche Zielposition
+      if (token.tokenState != TokenState.home) {
+        int targetPositionInPath = token.positionInPath + steps;
+
+        // Überprüfen, ob das Ziel über Position 51 hinausgeht
+        if (targetPositionInPath <= 51) {
+          Position targetPosition = _getPosition(currentPlayer, targetPositionInPath);
+
+          // Prüft, ob die Zielposition entweder leer ist oder von einem Token eines anderen Typs besetzt ist
+          bool canMoveToTarget = !_isPositionOccupiedBySameType(token, targetPosition);
+          if (canMoveToTarget) {
+            return true; // Ein gültiger Zug ist möglich
+          }
+        }
+      }
+    }
+
+    // Falls kein Token bewegt werden kann, geben wir false zurück
+    return false;
+  }
+
+
+
+
 
   void moveToken(Token token, int steps, DiceModel diceModel, BuildContext context) {
     if (hasMovedToken) {
