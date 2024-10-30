@@ -14,8 +14,7 @@ class GameState with ChangeNotifier {
   List<Position> blueInitital = [];
   List<Position> redInitital = [];
   TokenType currentPlayer = TokenType.green;
-  int noSixCount = 0;
-  bool hasMovedToken=false;
+  bool isAllowedToRoll = true;
   int rollCount = 0;
 
   bool isSafeZone(Token token, Position destination) {
@@ -102,8 +101,16 @@ class GameState with ChangeNotifier {
 
   }
 
-  void _switchToNextPlayer() {
-    //checkWinner(context);
+  void _switchToNextPlayer(DiceModel diceModel) {
+
+   print("switchtonextpalyer: rollCount+${rollCount}");
+   print("switchtonextpalyer: hasMovedToken+${isAllowedToRoll}");
+   print("switchtonextpalyer: currentPlayer+${currentPlayer.name}");
+
+
+   rollCount = 0;
+   diceModel.setDiceOne(0);
+   isAllowedToRoll = true;
 
 
     switch (currentPlayer) {
@@ -127,8 +134,7 @@ class GameState with ChangeNotifier {
     //muss noch getestet werden!!!
     currentPlayer = TokenType.green;
     rollCount = 0;
-    noSixCount = 0;
-    hasMovedToken = false;
+    isAllowedToRoll = true;
 
     //reset gametoken
     gameTokens = [
@@ -190,7 +196,6 @@ class GameState with ChangeNotifier {
 
   void debugModeSetToken() {
 
-
     gameTokens[0].tokenPosition = Position(7, 1);
     gameTokens[0].positionInPath = getPositionInPath(gameTokens[0].type, gameTokens[0].tokenPosition);
     gameTokens[0].tokenState = TokenState.normal;
@@ -208,9 +213,8 @@ class GameState with ChangeNotifier {
     gameTokens[3].tokenState = TokenState.normal;
 
 
-    hasMovedToken = false;
-    rollCount = 1;
-    noSixCount = 0;
+    isAllowedToRoll = true;
+    rollCount = 0;
 
     notifyListeners();
   }
@@ -219,81 +223,87 @@ class GameState with ChangeNotifier {
     return token.type == currentPlayer;
   }
 
-  int getRemainingRolls() { //ausgabe für remaining rolls
+  int getRemainingRolls() {
+    //Zeigt nur an wie viele Würfe der jenige übrig hat
+    //ändert keinen Wert!!
     bool hasTokenInPlay = gameTokens.any((token) =>
     token.type == currentPlayer &&
         token.tokenState != TokenState.home &&
         token.tokenState != TokenState.safezone);
-    return hasTokenInPlay ? 1 : (3 - rollCount);
+
+    if (hasTokenInPlay) {
+      return 1 - rollCount;
+    }
+    
+    return 3 - rollCount;
   }
 
-
   void rollDice(DiceModel diceModel) {
-    print("rollDice");
-    int diceRoll = diceModel.generateDiceOne();
+    print("rollDice wird gestartet...");
+    
+    var getRolls = getRemainingRolls();
 
-    hasMovedToken = false;
-    notifyListeners();
+    if (isAllowedToRoll && getRolls  > 0) {
 
-    // Überprüfen, ob keine verbleibenden Würfe vorhanden sind
-    if (getRemainingRolls() == 0) {
-      print("Keine verbleibenden Würfe");
-      diceModel.setDiceOne(0);
-      _switchToNextPlayer();
-      return;
-    }
-
-    bool hasTokenInPlay = gameTokens.any((token) =>
-    token.type == currentPlayer &&
-        token.tokenState == TokenState.normal);
-
-    if (!hasTokenInPlay && diceRoll != 6) {
-      rollCount++;
-      if (rollCount >= 3) {
-        rollCount = 0;
-        _switchToNextPlayer();
+      // Überprüft, ob verbleibende Würfe vorhanden sind
+      if (getRolls == 0) {
+        print("Keine verbleibenden Würfe, Spielerwechsel.");
+        _switchToNextPlayer(diceModel);
+        return;
       }
-    } else if (diceRoll == 6) {
-      rollCount = hasTokenInPlay ? 1 : 0;
-      print("6 geworfen, der Spieler darf erneut würfeln.");
-    } else {
-      if (!canAnyTokenMove(diceRoll)) {
-        print("Kein gültiger Zug möglich. Nächster Spieler ist dran.");
-        _switchToNextPlayer();
+
+      // Prüft, ob der Spieler einen Token im Spielfeld hat
+      bool hasTokenInPlay = gameTokens.any((token) =>
+      token.type == currentPlayer && token.tokenState == TokenState.normal);
+
+      if (!hasTokenInPlay && diceModel.diceOne != 6) {
+        rollCount++;
         notifyListeners();
+        if (rollCount >= 3) {
+          print("Keine würfe mehr frei.");
+          _switchToNextPlayer(diceModel);
+        }
+      }
+      // Bei einer 6: Der Spieler darf ins Spielfeld und erneut würfeln
+      else if (diceModel.diceOne == 6) {
+        rollCount = 0;
+        isAllowedToRoll = false;
+        print("6 geworfen, der Spieler darf erneut würfeln.");
+      }
+      // Wenn kein gültiger Zug möglich ist, wird zum nächsten Spieler gewechselt
+      else if (!canAnyTokenMove(diceModel.diceOne)) {
+        print("Kein gültiger Zug möglich. Nächster Spieler ist dran.");
+        _switchToNextPlayer(diceModel);
       } else {
+        isAllowedToRoll = false;
         print("Warten auf Bewegung des Spielers...");
       }
+    } else {
+      print("Der Spieler muss zuerst einen Token bewegen, bevor er erneut würfeln kann.");
     }
   }
 
 
   bool canAnyTokenMove(int steps) {
-    // Durchläuft alle Tokens des aktuellen Spielers
     for (Token token in gameTokens.where((t) => t.type == currentPlayer)) {
       // Prüft, ob ein Token im Home-Zustand ist und mit einer 6 herausgebracht werden könnte
       if (token.tokenState == TokenState.home && steps == 6) {
-        return true; // Ein gültiger Zug ist möglich
+        return true;
       }
 
-      // Wenn der Token im Spielfeld ist, berechne die mögliche Zielposition
       if (token.tokenState != TokenState.home) {
         int targetPositionInPath = token.positionInPath + steps;
 
-        // Überprüfen, ob das Ziel über Position 51 hinausgeht
         if (targetPositionInPath <= 51) {
           Position targetPosition = _getPosition(currentPlayer, targetPositionInPath);
 
-          // Prüft, ob die Zielposition entweder leer ist oder von einem Token eines anderen Typs besetzt ist
           bool canMoveToTarget = !_isPositionOccupiedBySameType(token, targetPosition);
           if (canMoveToTarget) {
-            return true; // Ein gültiger Zug ist möglich
+            return true;
           }
         }
       }
     }
-
-    // Falls kein Token bewegt werden kann, geben wir false zurück
     return false;
   }
 
@@ -302,33 +312,27 @@ class GameState with ChangeNotifier {
 
 
   void moveToken(Token token, int steps, DiceModel diceModel, BuildContext context) {
-    if (hasMovedToken) {
+
+    if (!isCurrentPlayer(token) || isAllowedToRoll) {
       print("Token kann nicht bewegt werden. Bitte würfeln Sie erneut.");
       return;
     }
-
-    if (!isCurrentPlayer(token)) return;
 
     Position destination;
     int pathPosition;
 
 
-    // Token von home ins Spiel bringen, wenn eine 6 geworfen wurde
     if (token.tokenState == TokenState.home && steps == 6) {
-      noSixCount = 0;
       destination = _getPosition(token.type, 0);
       pathPosition = 0;
 
-      // Sicherstellen, dass die Position nicht von einem eigenen Token besetzt ist
       if (_isPositionOccupiedBySameType(token, destination)) {
         print("if 1 Zug ungültig: Ein eigener Token befindet sich bereits auf der Startposition.");
         return;
       }
 
-      // Prüfen, ob ein gegnerischer Token auf der Zielposition ist und ggf. entfernen
       var cutToken = _updateBoardState(token, destination, pathPosition);
 
-      // Wenn ein gegnerischer Token vorhanden ist, wird dieser animiert zurückgesetzt
       if (cutToken != null) {
         animateCutTokenReset(cutToken);
       }
@@ -342,19 +346,18 @@ class GameState with ChangeNotifier {
       print("positionpath ${this.gameTokens[token.id].positionInPath}");
       print("positionpath ${this.gameTokens[token.id].tokenPosition}");
 
-      hasMovedToken = true;
-      rollCount = 1; //setzt würfel zurück auf eins
+      isAllowedToRoll = true;
+      rollCount = 0;
       notifyListeners();
     } else if (token.tokenState != TokenState.home) {
       // Token im Spielfeld bewegen
       int step = token.positionInPath + steps;
-      if (step > 51) return;
+      if (step > 51)
+        return;
 
       destination = _getPosition(token.type, step);
       pathPosition = step;
 
-      print("positionpath2 ${destination}");
-      print("positionpath2 ${pathPosition}");
 
 
       // Sicherstellen, dass Zielposition nicht von eigenem Token besetzt ist
@@ -367,7 +370,9 @@ class GameState with ChangeNotifier {
       // Bewegung animieren
       animateTokenMovement(token, steps, context);
 
-      //überprüft ob ein Spieler gewonnen hat
+      //counter zurückgesetzt
+      rollCount = 0;
+
       checkWinner(context);
 
       // Animation für das Zurücksetzen des geschlagenen Tokens
@@ -376,10 +381,10 @@ class GameState with ChangeNotifier {
       }
 
 
-      hasMovedToken = true;
+      isAllowedToRoll = true;
       if (steps != 6) {
-        noSixCount = 0;
-        _switchToNextPlayer();
+        _switchToNextPlayer(diceModel);
+
       }
 
     }
@@ -565,9 +570,6 @@ class GameState with ChangeNotifier {
       );
     }
   }
-
-
-
 }
 
 

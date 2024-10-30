@@ -88,6 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   onChanged: (TokenType? selectedPlayer) {
                     if (selectedPlayer != null) {
                       gameState.setCurrentPlayer(selectedPlayer);
+                      gameState.rollCount = 0;
+                      gameState.isAllowedToRoll = true;
                     }
                   },
                 ),

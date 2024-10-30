@@ -10,23 +10,26 @@ class Dice extends StatelessWidget {
   const Dice({super.key});
 
   void updateDices(DiceModel dice, GameState gameState) {
-    if (gameState.getRemainingRolls() == 0) {
-      dice.setDiceOne(0); // Setzt das Bild auf 0.png, wenn keine verbleibenden Würfe vorhanden sind
-      return;
-    }
+    if(gameState.isAllowedToRoll && gameState.getRemainingRolls() > 0) {
 
-    // Animation für den Würfel
-    for (int i = 0; i < 6; i++) {
-      var duration = 100 + i * 100;
-      Future.delayed(Duration(milliseconds: duration), () {
-        dice.setDiceOne(Random().nextInt(6) + 1);
+      if (gameState.getRemainingRolls() == 0) {
+        print("updateDice!!!!!!!!!!!!!!");
+        return;
+      }
+
+      for (int i = 0; i < 6; i++) {
+        var duration = 100 + i * 100;
+        Future.delayed(Duration(milliseconds: duration), () {
+          dice.setDiceOne(Random().nextInt(6) + 1);
+        });
+      }
+      Future.delayed(Duration(milliseconds: 600), () {
+        gameState.rollDice(dice);
       });
+    } else {
+      print("Der Spieler muss erst seinen Token bewegen, bevor er erneut würfeln kann.");
     }
 
-    Future.delayed(Duration(milliseconds: 600), () {
-      int finalRoll = dice.generateDiceOne();
-      gameState.rollDice(dice);
-    });
   }
 
   @override
@@ -76,6 +79,8 @@ class Dice extends StatelessWidget {
               onChanged: (int? newValue) {
                 if (newValue != null) {
                   dice.setDiceOne(newValue); // für Debugging
+                  //gameState.rollCount = 0;
+                  gameState.isAllowedToRoll = false;
                 }
               },
             ),
