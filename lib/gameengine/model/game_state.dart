@@ -8,14 +8,15 @@ import 'dice_model.dart';
 
 class GameState with ChangeNotifier {
   List<Token> gameTokens = List.filled(16, Token(TokenType.green, Position(0, 0), TokenState.home, 0), growable: false);
-  List<Position> starPositions = [];
-  List<Position> greenInitital = [];
-  List<Position> yellowInitital = [];
-  List<Position> blueInitital = [];
-  List<Position> redInitital = [];
   TokenType currentPlayer = TokenType.green;
   bool isAllowedToRoll = true;
   int rollCount = 0;
+
+  //homepath
+  final List<Position> greenHomePositions = [Position(1, 1), Position(1, 2), Position(2, 1), Position(2, 2)];
+  final List<Position> yellowHomePositions = [Position(1, 12), Position(1, 13), Position(2, 12), Position(2, 13)];
+  final List<Position> redHomePositions = [Position(12, 1), Position(12, 2), Position(13, 1), Position(13, 2)];
+  final List<Position> blueHomePositions = [Position(12, 12), Position(12, 13), Position(13, 12), Position(13, 13)];
 
   bool isSafeZone(Token token, Position destination) {
     final List<Position> greenSafeZone = [Position(7, 2), Position(7, 3), Position(7, 4), Position(7, 5)];
@@ -38,11 +39,6 @@ class GameState with ChangeNotifier {
   }
 
   bool isHomePosition(Token token, Position destination) {
-    final List<Position> greenHomePositions = [Position(1, 1), Position(1, 2), Position(2, 1), Position(2, 2)];
-    final List<Position> yellowHomePositions = [Position(1, 12), Position(1, 13), Position(2, 12), Position(2, 13)];
-    final List<Position> redHomePositions = [Position(12, 1), Position(12, 2), Position(13, 1), Position(13, 2)];
-    final List<Position> blueHomePositions = [Position(12, 12), Position(12, 13), Position(13, 12), Position(13, 13)];
-
     switch (token.type) {
       case TokenType.green:
         return greenHomePositions.contains(destination);
@@ -75,39 +71,32 @@ class GameState with ChangeNotifier {
 
   GameState() {
     this.gameTokens = [
-      //auch in isHomePosition ändern falls notwendig!!
       //Green
-      Token(TokenType.green, Position(1, 1), TokenState.home, 0),
-      Token(TokenType.green, Position(1, 2), TokenState.home, 1),
-      Token(TokenType.green, Position(2, 1), TokenState.home, 2),
-      Token(TokenType.green, Position(2, 2), TokenState.home, 3),
+      Token(TokenType.green, greenHomePositions[0], TokenState.home, 0),
+      Token(TokenType.green, greenHomePositions[1], TokenState.home, 1),
+      Token(TokenType.green, greenHomePositions[2], TokenState.home, 2),
+      Token(TokenType.green, greenHomePositions[3], TokenState.home, 3),
 
       // Yellow Tokens
-      Token(TokenType.yellow, Position(1, 12), TokenState.home, 4),
-      Token(TokenType.yellow, Position(1, 13), TokenState.home, 5),
-      Token(TokenType.yellow, Position(2, 12), TokenState.home, 6),
-      Token(TokenType.yellow, Position(2, 13), TokenState.home, 7),
+      Token(TokenType.yellow, yellowHomePositions[0], TokenState.home, 4),
+      Token(TokenType.yellow, yellowHomePositions[1], TokenState.home, 5),
+      Token(TokenType.yellow, yellowHomePositions[2], TokenState.home, 6),
+      Token(TokenType.yellow, yellowHomePositions[3], TokenState.home, 7),
       // Blue Tokens
-      Token(TokenType.red, Position(12, 1), TokenState.home, 8),
-      Token(TokenType.red, Position(12, 2), TokenState.home, 9),
-      Token(TokenType.red, Position(13, 1), TokenState.home, 10),
-      Token(TokenType.red, Position(13, 2), TokenState.home, 11),
+      Token(TokenType.red, redHomePositions[0], TokenState.home, 8),
+      Token(TokenType.red, redHomePositions[1], TokenState.home, 9),
+      Token(TokenType.red, redHomePositions[2], TokenState.home, 10),
+      Token(TokenType.red, redHomePositions[3], TokenState.home, 11),
       // Red Tokens
-      Token(TokenType.blue, Position(12, 12), TokenState.home, 12),
-      Token(TokenType.blue, Position(12, 13), TokenState.home, 13),
-      Token(TokenType.blue, Position(13, 12), TokenState.home, 14),
-      Token(TokenType.blue, Position(13, 13), TokenState.home, 15),
+      Token(TokenType.blue, blueHomePositions[0], TokenState.home, 12),
+      Token(TokenType.blue, blueHomePositions[1], TokenState.home, 13),
+      Token(TokenType.blue, blueHomePositions[2], TokenState.home, 14),
+      Token(TokenType.blue, blueHomePositions[3], TokenState.home, 15),
     ];
 
   }
 
   void _switchToNextPlayer(DiceModel diceModel) {
-
-   print("switchtonextpalyer: rollCount+${rollCount}");
-   print("switchtonextpalyer: hasMovedToken+${isAllowedToRoll}");
-   print("switchtonextpalyer: currentPlayer+${currentPlayer.name}");
-
-
    rollCount = 0;
    diceModel.setDiceOne(0);
    isAllowedToRoll = true;
@@ -131,12 +120,10 @@ class GameState with ChangeNotifier {
   }
   //reset game
   void resetGame() {
-    //muss noch getestet werden!!!
     currentPlayer = TokenType.green;
     rollCount = 0;
     isAllowedToRoll = true;
 
-    //reset gametoken
     gameTokens = [
       Token(TokenType.green, Position(1, 1), TokenState.home, 0),
       Token(TokenType.green, Position(1, 2), TokenState.home, 1),
@@ -337,14 +324,12 @@ class GameState with ChangeNotifier {
         animateCutTokenReset(cutToken);
       }
 
-      _updateInitalPositions(token);
+      gameTokens[token.id].tokenPosition = destination;
+      gameTokens[token.id].positionInPath = pathPosition;
+      gameTokens[token.id].tokenState = TokenState.normal;
 
-      this.gameTokens[token.id].tokenPosition = destination;
-      this.gameTokens[token.id].positionInPath = pathPosition;
-      this.gameTokens[token.id].tokenState = TokenState.normal;
-
-      print("positionpath ${this.gameTokens[token.id].positionInPath}");
-      print("positionpath ${this.gameTokens[token.id].tokenPosition}");
+      print("positionpath ${gameTokens[token.id].positionInPath}");
+      print("positionpath ${gameTokens[token.id].tokenPosition}");
 
       isAllowedToRoll = true;
       rollCount = 0;
@@ -475,42 +460,23 @@ class GameState with ChangeNotifier {
   }
 
 
-  void _updateInitalPositions(Token token) {
-
-    switch (token.type) {
-      case TokenType.green:
-        this.greenInitital.add(token.tokenPosition);
-        break;
-      case TokenType.yellow:
-        this.yellowInitital.add(token.tokenPosition);
-        break;
-      case TokenType.blue:
-        this.blueInitital.add(token.tokenPosition);
-        break;
-      case TokenType.red:
-        this.redInitital.add(token.tokenPosition);
-        break;
-    }
-  }
-
   void _cutToken(Token token) {
-
     switch (token.type) {
       case TokenType.green:
-        this.gameTokens[token.id].tokenState = TokenState.home;
-        this.gameTokens[token.id].tokenPosition = this.greenInitital.removeAt(0);
+        gameTokens[token.id].tokenState = TokenState.home;
+        gameTokens[token.id].tokenPosition = greenHomePositions[token.id];
         break;
       case TokenType.yellow:
-        this.gameTokens[token.id].tokenState = TokenState.home;
-        this.gameTokens[token.id].tokenPosition = this.yellowInitital.removeAt(0);
-        break;
-      case TokenType.blue:
-        this.gameTokens[token.id].tokenState = TokenState.home;
-        this.gameTokens[token.id].tokenPosition = this.blueInitital.removeAt(0);
+        gameTokens[token.id].tokenState = TokenState.home;
+        gameTokens[token.id].tokenPosition = yellowHomePositions[(token.id - 4)];
         break;
       case TokenType.red:
-        this.gameTokens[token.id].tokenState = TokenState.home;
-        this.gameTokens[token.id].tokenPosition = this.redInitital.removeAt(0);
+        gameTokens[token.id].tokenState = TokenState.home;
+        gameTokens[token.id].tokenPosition = redHomePositions[(token.id - 8)];
+        break;
+      case TokenType.blue:
+        gameTokens[token.id].tokenState = TokenState.home;
+        gameTokens[token.id].tokenPosition = blueHomePositions[(token.id - 12)];
         break;
     }
   }
