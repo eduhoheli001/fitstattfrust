@@ -4,18 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../gameengine/model/dice_model.dart';
 import '../gameengine/model/game_state.dart';
+import 'package:just_audio/just_audio.dart';
 
 
-class Dice extends StatelessWidget {
+class Dice extends StatefulWidget {
   const Dice({super.key});
 
-  void updateDices(DiceModel dice, GameState gameState) {
+  @override
+  State<Dice> createState() => _DiceState();
+}
+
+class _DiceState extends State<Dice> {
+  AudioPlayer player = AudioPlayer();
+
+  Future<void> updateDices(DiceModel dice, GameState gameState) async {
     if(gameState.isAllowedToRoll && gameState.getRemainingRolls() > 0) {
 
       if (gameState.getRemainingRolls() == 0) {
-        print("updateDice!!!!!!!!!!!!!!");
         return;
       }
+      await player.setAsset('assets/audios/rolling-dice.mp3');
+      player.play();
 
       for (int i = 0; i < 6; i++) {
         var duration = 100 + i * 100;
@@ -35,13 +44,13 @@ class Dice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> _diceImages = [
-      "assets/0.png", // Bild für 0 Würfe
-      "assets/1.png",
-      "assets/2.png",
-      "assets/3.png",
-      "assets/4.png",
-      "assets/5.png",
-      "assets/6.png",
+      "assets/images/0.png", // Bild für 0 Würfe
+      "assets/images/1.png",
+      "assets/images/2.png",
+      "assets/images/3.png",
+      "assets/images/4.png",
+      "assets/images/5.png",
+      "assets/images/6.png",
     ];
 
     final dice = Provider.of<DiceModel>(context);

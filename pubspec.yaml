@@ -33,6 +33,8 @@ dependencies:
   provider: ^6.1.2
   equatable: ^2.0.5
   cupertino_icons: ^1.0.8
+  cubixd: ^0.1.1
+  just_audio: ^0.9.42
 
 dev_dependencies:
   flutter_test:
@@ -53,15 +55,15 @@ flutter:
   uses-material-design: true
   assets:
     - assets/Ludo_board.png
-    - assets/0.png
-    - assets/1.png
-    - assets/2.png
-    - assets/3.png
-    - assets/4.png
-    - assets/5.png
-    - assets/6.png
+    - assets/images/0.png
+    - assets/images/1.png
+    - assets/images/2.png
+    - assets/images/3.png
+    - assets/images/4.png
+    - assets/images/5.png
+    - assets/images/6.png
     - assets/test.png
-
+    - assets/audios/rolling-dice.mp3
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
