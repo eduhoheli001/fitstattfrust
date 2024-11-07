@@ -22,22 +22,22 @@ class FitStattFrust extends StatelessWidget {
           ChangeNotifierProvider(create: (context) => GameState()),
           ChangeNotifierProvider(create: (context) => DiceModel()),
         ],
-        child: MyHomePage(title: 'Fit statt Frust Spiel'),
+        child: gameStartPage(title: 'Fit statt Frust Spiel'),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title}) : super(key: key);
+class gameStartPage extends StatefulWidget {
+  gameStartPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _gameStartPageState createState() => _gameStartPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _gameStartPageState extends State<gameStartPage> {
   GlobalKey keyBar = GlobalKey();
 
   @override
@@ -69,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () => gameState.resetGame(),
                   child: Text("Spiel zurücksetzen"),
                 ),
+              if(gameState.debugmode)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

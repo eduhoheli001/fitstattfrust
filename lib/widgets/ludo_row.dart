@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import '../utility.dart';
 
-class LudoRow extends StatelessWidget {
-
+class CustomRow extends StatelessWidget {
   final int row;
   final List<GlobalKey> keyRow;
-  LudoRow(this.row,this.keyRow);
+  const CustomRow(this.row,this.keyRow, {super.key});
 
   List<Flexible> _getColumns() {
     List<Flexible> columns = [];
@@ -25,7 +24,7 @@ class LudoRow extends StatelessWidget {
               ),
               color: Colors.transparent,//Utility.getColor(row, i)
             ),
-            child: Text('${row},${i}', style: TextStyle(color:Colors.black,fontSize: 10)),
+            //child: Text('${row},${i}', style: TextStyle(color:Colors.black,fontSize: 10)),
           ),
         ),
       ));

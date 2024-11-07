@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import './ludo_row.dart';
 
 class Board extends StatelessWidget {
-  List<List<GlobalKey>> keyRefrences;
-  Board(this.keyRefrences);
+  final List<List<GlobalKey>> keyRefrences;
+  const Board(this.keyRefrences, {super.key});
 
   bool isDesktop(BuildContext context)=> MediaQuery.of(context).size.width >= 600;
 
@@ -12,15 +12,15 @@ class Board extends StatelessWidget {
     for (var i = 0; i < 15; i++) {
       rows.add(
         Container(
-          child: LudoRow(i,keyRefrences[i]),
           decoration: BoxDecoration(
             border: Border(
-              top: BorderSide(color: Colors.grey),
+              //top: BorderSide(color: Colors.grey),
               bottom:
                   i == 14 ? BorderSide(color: Colors.grey) : BorderSide.none,
             ),
             color: Colors.transparent,
           ),
+          child: CustomRow(i,keyRefrences[i]),
         ),
       );
     }

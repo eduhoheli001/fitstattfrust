@@ -67,7 +67,9 @@ class Dice extends StatelessWidget {
                 ),
               ),
             ),
+            if(gameState.debugmode)
             SizedBox(width: 10),
+            if(gameState.debugmode)
             DropdownButton<int>(
               value: dice.diceOne,
               items: List.generate(7, (index) => index).map((int value) {

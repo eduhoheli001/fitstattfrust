@@ -8,7 +8,7 @@ class GamePlay extends StatefulWidget {
   final GlobalKey keyBar;
   final GameState gameState;
 
-  GamePlay(this.keyBar, this.gameState);
+  const GamePlay(this.keyBar, this.gameState, {super.key});
 
   @override
   _GamePlayState createState() => _GamePlayState();
@@ -29,11 +29,11 @@ class _GamePlayState extends State<GamePlay> {
     });
   }
 
-  void callBack(Token token) {
+  /*void callBack(Token token) {
     print(token);
     print(token.tokenState.name);
     print(token.type);
-  }
+  }*/
 
   static List<List<GlobalKey<State>>> _getGlobalKeys() {
     List<List<GlobalKey<State>>> keysMain = [];
