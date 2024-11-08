@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sidebar Example',
+      title: 'Fit statt frust',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -51,7 +51,7 @@ class _GameScreenState extends State<GameScreen> {
     return Scaffold(
       appBar: AppBar(
         key: keyBar,
-        title: Text('Ludo Sidebar Menu'),
+        title: Text('Fit statt Frust'),
       ),
       drawer: Drawer(
         child: ListView(

@@ -15,7 +15,7 @@ class GameState with ChangeNotifier {
   TokenType currentPlayer = TokenType.green;
   bool isAllowedToRoll = true;
   int rollCount = 0;
-  bool debugmode = true;
+  bool debugmode = false;
 
   //homepath
   final List<Position> greenHomePositions = [
