@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import './ludo_row.dart';
 
-class Board extends StatelessWidget {
+class BoardWidget extends StatelessWidget {
   final List<List<GlobalKey>> keyRefrences;
-  const Board(this.keyRefrences, {super.key});
+  const BoardWidget(this.keyRefrences, {super.key});
 
   bool isDesktop(BuildContext context)=> MediaQuery.of(context).size.width >= 600;
 

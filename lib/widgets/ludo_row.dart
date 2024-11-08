@@ -18,7 +18,7 @@ class CustomRow extends StatelessWidget {
             decoration: BoxDecoration(
               //borderRadius: BorderRadius.circular(50),
               border: Border(
-                left: BorderSide(color: Colors.black,width:1.0),
+                left: BorderSide(color: Colors.black, width:1.0),
                 right:
                     i == 14 ? BorderSide(color: Colors.grey) : BorderSide.none,
               ),

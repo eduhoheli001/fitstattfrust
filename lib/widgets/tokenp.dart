@@ -22,7 +22,6 @@ class Tokenp extends StatelessWidget {
       case TokenType.red:
         return Colors.red;
     }
-   // return Colors.red;
   }
 
   @override
@@ -38,10 +37,7 @@ class Tokenp extends StatelessWidget {
       height: dimentions[3],
       child: GestureDetector(
         onTap: () {
-          // nullable fix -> check current player
-          if (gameState != null && dice != null) {
             gameState.moveToken(token, dice.diceOne, dice,context);
-          }
         },
         child: Card(
           elevation: 5,

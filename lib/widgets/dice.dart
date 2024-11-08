@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../gameengine/model/dice_model.dart';
@@ -18,44 +17,49 @@ class _DiceState extends State<Dice> {
   AudioPlayer player = AudioPlayer();
   double _currentAngle = 0;
   Timer? _rotationTimer;
+  bool animateDice = false; //für async -> animation -> sonst schleife
 
   Future<void> updateDices(DiceModel dice, GameState gameState) async {
-    if (gameState.isAllowedToRoll && gameState.getRemainingRolls() > 0) {
-      if (gameState.getRemainingRolls() == 0) {
-        return;
-      }
+    if (animateDice == false) {
+      if (gameState.isAllowedToRoll && gameState.getRemainingRolls() > 0) {
+        if (gameState.getRemainingRolls() == 0) {
+          return;
+        }
 
-      setState(() {
-        _currentAngle = Random().nextDouble() * 2 * pi;
-      });
-
-
-      await player.setAsset('assets/audios/rolling-dice.mp3');
-      player.play();
-
-      _rotationTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
         setState(() {
-          _currentAngle += pi / 6; // 30 Grad pro Schritt
+          animateDice = true;
+          _currentAngle = Random().nextDouble() * 2 * pi;
         });
-      });
 
-      for (int i = 0; i < 6; i++) {
-        var duration = 100 + i * 100;
-        Future.delayed(Duration(milliseconds: duration), () {
-          dice.setDiceOne(Random().nextInt(6) + 1);
+        await player.setAsset('assets/audios/rolling-dice.mp3');
+        player.play();
+
+        _rotationTimer =
+            Timer.periodic(const Duration(milliseconds: 50), (timer) {
+          setState(() {
+            _currentAngle += pi / 6; // 30 Grad pro Schritt
+          });
         });
+
+        for (int i = 0; i < 6; i++) {
+          var duration = 100 + i * 100;
+          Future.delayed(Duration(milliseconds: duration), () {
+            dice.setDiceOne(Random().nextInt(6) + 1);
+          });
+        }
+
+        Future.delayed(Duration(milliseconds: 600), () {
+          gameState.rollDice(dice);
+          animateDice = false;
+          _rotationTimer?.cancel();
+          setState(() {
+            _currentAngle = 0;
+          });
+        });
+      } else {
+        print(
+            "Der Spieler muss erst seinen Token bewegen, bevor er erneut würfeln kann.");
       }
-
-      Future.delayed(Duration(milliseconds: 600), () {
-        gameState.rollDice(dice);
-
-        _rotationTimer?.cancel();
-        setState(() {
-          _currentAngle = 0;
-        });
-      });
-    } else {
-      print("Der Spieler muss erst seinen Token bewegen, bevor er erneut würfeln kann.");
     }
   }
 
@@ -81,48 +85,18 @@ class _DiceState extends State<Dice> {
     final dice = Provider.of<DiceModel>(context);
     final gameState = Provider.of<GameState>(context, listen: false);
 
-    return Card(
-      elevation: 10,
-      child: Container(
-        padding: const EdgeInsets.all(8),
+    return GestureDetector(
+      onTap: () => updateDices(dice, gameState),
+      child: SizedBox(
+        width: 60,
         height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () => updateDices(dice, gameState),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: Transform.rotate(
-                  angle: _currentAngle,
-                  child: Image.asset(
-                    _diceImages[dice.diceOne],
-                    gaplessPlayback: true,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-              ),
-            ),
-            if (gameState.debugmode)
-              const SizedBox(width: 10),
-            if (gameState.debugmode)
-              DropdownButton<int>(
-                value: dice.diceOne,
-                items: List.generate(7, (index) => index).map((int value) {
-                  return DropdownMenuItem<int>(
-                    value: value,
-                    child: Text(value.toString()),
-                  );
-                }).toList(),
-                onChanged: (int? newValue) {
-                  if (newValue != null) {
-                    dice.setDiceOne(newValue);
-                    gameState.isAllowedToRoll = false;
-                  }
-                },
-              ),
-          ],
+        child: Transform.rotate(
+          angle: _currentAngle,
+          child: Image.asset(
+            _diceImages[dice.diceOne],
+            gaplessPlayback: true,
+            fit: BoxFit.fill,
+          ),
         ),
       ),
     );

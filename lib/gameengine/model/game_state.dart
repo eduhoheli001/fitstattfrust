@@ -15,7 +15,7 @@ class GameState with ChangeNotifier {
   TokenType currentPlayer = TokenType.green;
   bool isAllowedToRoll = true;
   int rollCount = 0;
-  bool debugmode = false;
+  bool debugmode = true;
 
   //homepath
   final List<Position> greenHomePositions = [
@@ -109,7 +109,20 @@ class GameState with ChangeNotifier {
       case TokenType.red:
         return "Rot";
     }
-    return "";
+  }
+  MaterialAccentColor getColorCurrentPlayer() {
+    switch (currentPlayer) {
+      case TokenType.green:
+        return Colors.greenAccent;
+      case TokenType.yellow:
+        return Colors.yellowAccent;
+      case TokenType.blue:
+        return Colors.blueAccent;
+      case TokenType.red:
+        return Colors.redAccent;
+      default:
+        return Colors.greenAccent;// Standardfarbe, falls der Spieler nicht definiert ist
+    }
   }
 
   GameState() {

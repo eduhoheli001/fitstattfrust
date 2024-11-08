@@ -38,6 +38,7 @@ class QuestionTest {
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           title: Text(randomQuestion.questionText),

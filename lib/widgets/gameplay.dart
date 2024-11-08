@@ -28,13 +28,6 @@ class _GamePlayState extends State<GamePlay> {
       });
     });
   }
-
-  /*void callBack(Token token) {
-    print(token);
-    print(token.tokenState.name);
-    print(token.type);
-  }*/
-
   static List<List<GlobalKey<State>>> _getGlobalKeys() {
     List<List<GlobalKey<State>>> keysMain = [];
     for (int i = 0; i < 15; i++) {
@@ -93,7 +86,7 @@ class _GamePlayState extends State<GamePlay> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Board(keyRefrences),
+        BoardWidget(keyRefrences),
         ..._getTokenList(),
       ],
     );
